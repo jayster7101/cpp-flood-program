@@ -1,0 +1,336 @@
+/*
+From:Jayden Jardine & Jaabir 
+Function of program: The function of the progam is to get the users flood level, make a map to help visualize the flooded, not flood, or at flood level areas.
+This map wil have a cordinate system and a key, the cordinate system allows the user to see where the data is more accurately, and the key will allow the user to interprit the map easier.
+It also runs tests from the given data set to find the lowest water level, highest water level, and average water level. 
+*/
+
+#include <iostream>
+int const arrayL = 12;
+int const arrayR = 6;
+/*
+greet_user_return_name()
+simple greeting function that is supposed takes in the users name 
+@param none 
+@return name
+*/
+std::string greet_user_return_name() 
+{
+    std::string name;
+    std::cout<< "Hello, this program is designed to receive a flood level and provide a simple map to help visualize what areas are affected.\n";
+    std::cout << "In addition to the map, we will provide every location in which the water level is at its lowest and where its at its highest.\n";
+    std::cout<<"For research purposes we will be sure to include the average water level so you can see if's higher or lower then usual.\n";
+    std::cout<<"We kindly ask you to provide your name \n";
+    std::cin >> name;
+    return name;    
+}
+
+/*
+enter_program_returns_bool()
+asks the user if they would like to enter the program 
+@param name  
+@return bool return_value 
+*/
+bool enter_program_returns_bool(std::string name)
+{
+    bool return_value;
+    std::string yes_no;
+    std::cout<< "Hello, " + name + " would you like to try our progam out? \n";
+    std::cout<<"Please enter yes or no: \n";
+    bool reprompt = false;
+        while(!reprompt) // this is the first instance of input validation which only accepts yes or Yes or No or no and will keep prompting until valid
+        {
+            std::cin.ignore(100, '\n'); // ignores the flag on the error 
+            std::cin >> yes_no;
+            if(yes_no =="yes" || yes_no =="Yes")// the logic below compares the string to the 4 possible values, and then returns true or false to either enter the if statement or skip to the else statement in the main function
+            {
+                reprompt = true;
+                return_value = true;
+            }
+            else if (yes_no =="no" || yes_no =="No")
+            {
+                reprompt = true;
+                return_value = false;
+            }
+            else
+            {
+                std::cout<<"Please enter yes or no only\n";
+            }
+        }
+    return return_value;
+}
+/*
+flood_level_returns_level()
+asks the user the flood level they would like to run test on
+@param none  
+@return double flood_level 
+*/
+double flood_level_returns_level()
+{
+    std::cout<<"Please enter the flood level that you would like to run tests on :";
+    double flood_level;
+    std::cin>> flood_level;
+    while(std::cin.fail() || flood_level < 0)
+    {
+        std::cin.clear();// clears flag from cin.ignore() and ignores new data on each iteration 
+        std::cin.ignore(250, '\n');
+        std::cout << "That was not a valid flood level, ";
+        if(flood_level < 0)
+        {
+            std::cout<<"flood levels cant be negative please enter a new value: "; // diffrent outputs for different wrong values
+        } else 
+        {
+             std::cout<<"flood levels cant be strings, please enter a new value: ";
+        }
+        std::cin >> flood_level;
+    }
+    return flood_level;
+}
+
+/*
+print_table()
+print the table from the arrays 
+@param array,flood_level  
+@return none 
+*/
+void print_table(double data[arrayR][arrayL], double flood_level)
+{
+    for(int v = 0; v < arrayL+1 ; v++) // prints first row 1-length of data left to right
+    {
+        if(v ==0 )
+        {
+            std::cout<<"    ";
+        }
+        else
+        {
+        if(v < 10)
+        {
+            std::cout<<"0";
+        }
+            
+        std::cout<< v  << "  ";
+        }
+    }
+    std::cout<<std::endl;
+    for(int i = 0; i < arrayR; i++)
+    {
+        if(i < 10) // adds a zero to begging of numbers 1-9 so the output is even with 2 characters 
+        {
+            std::cout<<"0";
+        }
+        std::cout << i+1 << "   "; // prints first row 1-length of data top to bottom
+        for(int j = 0; j < arrayL; j++)// this loop print the map with space based on the values passed in as paramters
+        {   
+            if(data[i][j] > flood_level) 
+            {
+                std::cout<< "^   ";
+            }
+            else if(data[i][j] == flood_level)
+            {
+                std::cout<<"-   ";
+
+            }
+            else
+            {
+                std::cout << "*   ";
+            }
+        }
+        std::cout << "\n";
+    }
+}
+
+/*
+lowest_level()
+finds lowest value in array
+@param array  
+@return lowest 
+*/
+double lowest_level(double data[arrayR][arrayL]) // finds lowest level of water/data in the array
+{   
+    double lowest = data[0][0];
+    for(int i = 0; i < 5; i++)
+    {
+        for(int j = 0; j < arrayL; j++)
+        {
+            if(data[i][j] < lowest)
+            {
+                lowest = data[i][j];
+            }
+        }
+    }
+    return lowest;
+    
+}
+
+/*
+highest_level()
+finds highest value in array
+@param array  
+@return highest 
+*/
+double highest_level(double data[arrayR][arrayL])// finds highest level of water/data in the array
+{   
+    double highest = data[0][0];
+    for(int i = 0; i < arrayR; i++)
+    {
+        for(int j = 0; j < arrayL; j++)
+        {
+            if(data[i][j] > highest)
+            {
+                highest = data[i][j];
+            }
+        }
+    }
+    return highest;
+}
+/*
+average()
+does simple math to find the average value in the array
+@param array  
+@return average_level 
+*/
+double average(double data[arrayR][arrayL])// calculates average level of water/data in the array and keeps track of count 
+{   
+    int count = 0;
+    double average_level;
+    double temp;
+    for(int i = 0; i < arrayR; i++)
+    {
+        for(int j = 0; j < arrayL; j++)
+        {
+            temp = temp + data[i][j];
+            count ++;
+        }
+        average_level = temp / count;
+    }
+    return average_level;
+    
+}
+/*
+print_high_low()
+prints where the number paramter is equal to in the array (locations) 
+@param array, number
+@return none 
+*/
+void print_high_low(double data[arrayR][arrayL], double number) // this prints out where the highest or lowest data is on a cordinate system
+{
+    //std::cout << number;
+    for(int i = 0; i < arrayR; i++)
+    {
+        for(int j = 0; j < arrayL; j++)
+        {   
+            if(data[i][j] == number)
+            { 
+                std:: cout <<" {" << i+1 << ","<< j+1 << "}";
+            }
+        }
+      
+    }
+}
+/*
+recheck_user()
+asks the user if they would like ot try the program again
+@param none
+@return bool retry 
+*/
+bool recheck_user() 
+{
+    std::cout << "Would you like to try the program out again? Please enter Yes or No.\n";
+    std::string yes_no;
+    bool retry;
+    bool reprompt = false;
+        while(!reprompt) // handels user errors and takes in string value and converts to bool
+        {
+            std::cin.ignore(100, '\n');
+            std::cin >> yes_no;
+            if(yes_no =="yes" || yes_no =="Yes")
+            {
+                reprompt = true;
+                retry = true;
+            }
+            else if (yes_no =="no" || yes_no =="No")
+            {
+                reprompt = true;
+                retry = false;
+            }
+            else
+            {
+                std::cout<<"Please enter yes or no only\n";
+            }
+        }
+        return retry;
+}
+/*
+thank_user()
+prints a nice goodbye/thank you with their name 
+@param name
+@return none
+*/
+void thank_user(std::string name)
+{
+    std::cout<< "Thank you " + name + " for using our program. We hope it was valuable and brought valuable information to you.\n";
+}
+
+/*
+print_key()
+prints the key for the user to see what the characters definition is 
+@param name
+@return none
+*/
+void print_key ()
+{
+    std::cout << "The ^ symbol represents flooding\n" ;
+    std::cout << "The - symbol represents at flood level\n" ;
+    std::cout << "The * symbol represents under flood level\n";
+}
+
+
+
+
+
+
+
+
+int main()
+{
+    double data [arrayR][arrayL] = 
+    {
+{45.9,  45.8,  34.4,  34.2,  35.1,  35.2,  35.6,  36.0,  36.7,  37.3, 33.6, 28.5},
+{33.4,  45.9,  34.4,  34.2,  35.7,  35.2,  35.3,  38.0,  38.7,  37.0, 28.5, 28.6},
+{33.5,  34.5,  45.9,  34.2,  36.2,  35.2,  35.7,  36.2,  40.7,  28.5, 29.9, 31.2},
+{33.7,  35.5,  34.4,  45.9,  35.1,  35.2,  41.6,  36.4,  28.5,  34.0, 32.6, 40.2},
+{34.0,  34.1,  35.4,  38.3,  45.9,  40.2,  28.6,  28.5 , 38.7, 35.0, 29.8, 30.3},
+{34.5,  33.1  ,36.8 , 38.3 , 41.9 , 45.9 , 28.5 , 37.0 , 38.7 , 35.0 ,32.3, 45.9}
+}
+;
+    std::string name = greet_user_return_name(); // takes name in
+    bool enter = enter_program_returns_bool(name); //uses name and finds if the user wants to enter program
+    double flood_level; // defines flood_level double
+   while(enter) // uses data from above to enter or not
+   {
+        flood_level = flood_level_returns_level(); // gets the flood level 
+        print_table(data,flood_level); // prints table with flood_level variable
+        print_key(); // simple print key
+        double lowest = lowest_level(data); // sets lowest to lowest double in data set
+         double highest = highest_level(data);// sets highest to highest double in data set
+        std::cout<< "The lowest water level is " << lowest << " at:"; // prints the lowest 
+        print_high_low(data,lowest); // prints where the lowest data is
+        std::cout << std::endl;
+        std::cout << "The highest water level is " << highest << " at:";// prints the highest 
+        print_high_low(data,highest);// prints where the lowest data is
+        std::cout << std::endl;
+        double aver = average(data); // prints average out
+        std::cout<< "The average is " << aver << "\n";
+        enter = recheck_user(); // asks user if they want to try again and save return value to enter 
+        if(enter == false) // checks users "enter" decision and either exit the program with a return 0 or runs program again 
+        {
+            thank_user(name);
+            return 0;
+        }
+
+   }
+   // if the users said no to entering the program is skips to this statement
+   std::cout << "We are sorry that you didn't have the time to try out this wonderful program. Have a good rest of your day, " + name + " !\n";
+    
+        
+}
